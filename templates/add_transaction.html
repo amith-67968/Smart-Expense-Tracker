@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Add Transaction — Student Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="page-container page-narrow">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Add Transaction</h1>
+            <p class="page-subtitle">Record a new income or expense</p>
+        </div>
+        <a href="{{ url_for('transactions') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+    </div>
+
+    <div class="form-card">
+
+        <!-- Type Selector (big toggle) -->
+        <div class="type-selector mb-4">
+            <label class="type-option" id="labelIncome">
+                <input type="radio" name="typeToggle" value="Income" checked hidden>
+                <span class="type-btn type-income">
+                    <i class="bi bi-arrow-down-circle-fill me-2"></i>Income
+                </span>
+            </label>
+            <label class="type-option" id="labelExpense">
+                <input type="radio" name="typeToggle" value="Expense" hidden>
+                <span class="type-btn type-expense">
+                    <i class="bi bi-arrow-up-circle-fill me-2"></i>Expense
+                </span>
+            </label>
+        </div>
+
+        <form method="POST" action="{{ url_for('add_transaction') }}" id="txForm">
+            <!-- Hidden type field synced by JS -->
+            <input type="hidden" name="type" id="hiddenType" value="Income">
+
+            <div class="row g-4">
+                <!-- Amount -->
+                <div class="col-md-6">
+                    <label class="form-label-custom">Amount (₹) <span class="text-danger">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-currency-rupee input-icon"></i>
+                        <input type="number" name="amount" step="0.01" min="0.01"
+                               class="form-control form-control-custom" placeholder="0.00" required>
+                    </div>
+                </div>
+
+                <!-- Date -->
+                <div class="col-md-6">
+                    <label class="form-label-custom">Date <span class="text-danger">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-calendar3 input-icon"></i>
+                        <input type="date" name="date" value="{{ today }}"
+                               class="form-control form-control-custom" required>
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div class="col-md-6">
+                    <label class="form-label-custom">Category <span class="text-danger">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-tag input-icon"></i>
+                        <select name="category" class="form-select form-select-custom" required>
+                            <option value="" disabled selected>Select category</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat }}">{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="col-md-6">
+                    <label class="form-label-custom">Description</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-card-text input-icon"></i>
+                        <input type="text" name="description"
+                               class="form-control form-control-custom" placeholder="Optional note...">
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary-custom w-100 btn-lg-custom">
+                        <i class="bi bi-check-circle me-2"></i>Save Transaction
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

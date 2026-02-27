@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Transactions — Student Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+    <!-- ── Header ──────────────────────────────────────────────────────────── -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">All Transactions</h1>
+            <p class="page-subtitle">{{ transactions|length }} record(s) found</p>
+        </div>
+        <a href="{{ url_for('add_transaction') }}" class="btn btn-primary-custom">
+            <i class="bi bi-plus-lg me-1"></i>Add Transaction
+        </a>
+    </div>
+
+    <!-- ── Filters ─────────────────────────────────────────────────────────── -->
+    <div class="filter-card mb-4">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-sm-4 col-lg-3">
+                <label class="form-label-custom">Month</label>
+                <input type="month" name="month" value="{{ selected_month }}"
+                       class="form-control form-control-custom">
+            </div>
+            <div class="col-sm-4 col-lg-3">
+                <label class="form-label-custom">Type</label>
+                <select name="type" class="form-select form-select-custom">
+                    <option value="">All Types</option>
+                    <option value="Income"  {% if selected_type == 'Income' %}selected{% endif %}>Income</option>
+                    <option value="Expense" {% if selected_type == 'Expense' %}selected{% endif %}>Expense</option>
+                </select>
+            </div>
+            <div class="col-sm-4 col-lg-3">
+                <label class="form-label-custom">Category</label>
+                <select name="category" class="form-select form-select-custom">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary-custom flex-grow-1">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+                <a href="{{ url_for('transactions') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- ── Table ───────────────────────────────────────────────────────────── -->
+    <div class="card-custom">
+        <div class="card-custom-body p-0">
+            {% if transactions %}
+            <div class="table-responsive">
+                <table class="table table-custom mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th class="text-end">Amount</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in transactions %}
+                        <tr class="tx-row">
+                            <td class="text-muted">{{ loop.index }}</td>
+                            <td>
+                                <div class="tx-desc fw-500">{{ tx.description or '—' }}</div>
+                            </td>
+                            <td>
+                                <span class="badge badge-category">{{ tx.category }}</span>
+                            </td>
+                            <td class="text-muted">{{ tx.date }}</td>
+                            <td>
+                                <span class="badge {% if tx.type == 'Income' %}badge-income{% else %}badge-expense{% endif %}">
+                                    <i class="bi bi-{% if tx.type == 'Income' %}arrow-down{% else %}arrow-up{% endif %} me-1"></i>
+                                    {{ tx.type }}
+                                </span>
+                            </td>
+                            <td class="text-end fw-600 {% if tx.type == 'Income' %}text-income{% else %}text-expense{% endif %}">
+                                {% if tx.type == 'Income' %}+{% else %}-{% endif %}₹{{ "%.2f"|format(tx.amount) }}
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <a href="{{ url_for('edit_transaction', tx_id=tx.id) }}"
+                                       class="btn btn-action btn-edit" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('delete_transaction', tx_id=tx.id) }}"
+                                          onsubmit="return confirm('Delete this transaction?')">
+                                        <button type="submit" class="btn btn-action btn-delete" title="Delete">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state py-5">
+                <i class="bi bi-search fs-1 mb-3"></i>
+                <p class="mb-3">No transactions match your filters.</p>
+                <a href="{{ url_for('transactions') }}" class="btn btn-primary-custom">
+                    Clear Filters
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
