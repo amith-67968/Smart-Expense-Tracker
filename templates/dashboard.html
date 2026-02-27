@@ -7,10 +7,10 @@
     <!-- ── Page Header ──────────────────────────────────────────────────────── -->
     <div class="page-header">
         <div>
+            <p class="page-subtitle mb-1"><i class="bi bi-hand-wave me-1"></i>Welcome back, {{ session.user_name }}!</p>
             <h1 class="page-title">Dashboard</h1>
-            <p class="page-subtitle">Your financial overview at a glance</p>
         </div>
-        <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
             <!-- Month filter -->
             <form method="GET" class="d-flex align-items-center gap-2">
                 <input type="month" name="month" value="{{ selected_month }}"
@@ -37,7 +37,7 @@
     <!-- ── Summary Cards ─────────────────────────────────────────────────────── -->
     <div class="row g-4 mb-4">
         <div class="col-md-4">
-            <div class="stat-card stat-income">
+            <div class="stat-card stat-income" style="animation-delay: .1s">
                 <div class="stat-icon">
                     <i class="bi bi-arrow-down-circle-fill"></i>
                 </div>
@@ -49,7 +49,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stat-card stat-expense">
+            <div class="stat-card stat-expense" style="animation-delay: .2s">
                 <div class="stat-icon">
                     <i class="bi bi-arrow-up-circle-fill"></i>
                 </div>
@@ -61,7 +61,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stat-card {% if balance >= 0 %}stat-balance{% else %}stat-balance-neg{% endif %}">
+            <div class="stat-card {% if balance >= 0 %}stat-balance{% else %}stat-balance-neg{% endif %}" style="animation-delay: .3s">
                 <div class="stat-icon">
                     <i class="bi bi-{% if balance >= 0 %}piggy-bank-fill{% else %}exclamation-circle-fill{% endif %}"></i>
                 </div>
@@ -160,7 +160,8 @@
             {% else %}
             <div class="empty-state">
                 <i class="bi bi-inbox fs-1 mb-3"></i>
-                <p class="mb-3">No transactions yet.</p>
+                <p class="mb-1 fw-500" style="color: var(--text-2);">No transactions yet</p>
+                <p class="mb-3">Start tracking by adding your first transaction.</p>
                 <a href="{{ url_for('add_transaction') }}" class="btn btn-primary-custom">
                     <i class="bi bi-plus-lg me-1"></i>Add your first transaction
                 </a>
@@ -173,18 +174,23 @@
 {% endblock %}
 
 {% block scripts %}
+<div id="chartDataHolder"
+     data-bar-labels='{{ chart_labels  | tojson }}'
+     data-bar-income='{{ chart_income  | tojson }}'
+     data-bar-expense='{{ chart_expense | tojson }}'
+     data-pie-labels='{{ pie_labels    | tojson }}'
+     data-pie-values='{{ pie_values    | tojson }}'
+     hidden></div>
 <script>
-// ── Pass Python data to JavaScript ───────────────────────────────────────────
-const chartData = {
-    barLabels:  {{ chart_labels  | tojson }},
-    barIncome:  {{ chart_income  | tojson }},
-    barExpense: {{ chart_expense | tojson }},
-    pieLabels:  {{ pie_labels    | tojson }},
-    pieValues:  {{ pie_values    | tojson }}
-};
-
-// Initialize charts after DOM loads
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function () {
+    var el = document.getElementById('chartDataHolder');
+    var chartData = {
+        barLabels:  JSON.parse(el.dataset.barLabels),
+        barIncome:  JSON.parse(el.dataset.barIncome),
+        barExpense: JSON.parse(el.dataset.barExpense),
+        pieLabels:  JSON.parse(el.dataset.pieLabels),
+        pieValues:  JSON.parse(el.dataset.pieValues)
+    };
     initBarChart(chartData);
     if (chartData.pieLabels.length > 0) initPieChart(chartData);
 });

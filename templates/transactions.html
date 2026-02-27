@@ -8,7 +8,9 @@
     <div class="page-header">
         <div>
             <h1 class="page-title">All Transactions</h1>
-            <p class="page-subtitle">{{ transactions|length }} record(s) found</p>
+            <p class="page-subtitle">
+                <i class="bi bi-receipt me-1"></i>{{ transactions|length }} record{{ 's' if transactions|length != 1 else '' }} found
+            </p>
         </div>
         <a href="{{ url_for('add_transaction') }}" class="btn btn-primary-custom">
             <i class="bi bi-plus-lg me-1"></i>Add Transaction
@@ -19,21 +21,27 @@
     <div class="filter-card mb-4">
         <form method="GET" class="row g-3 align-items-end">
             <div class="col-sm-4 col-lg-3">
-                <label class="form-label-custom">Month</label>
+                <label class="form-label-custom">
+                    <i class="bi bi-calendar3 me-1"></i>Month
+                </label>
                 <input type="month" name="month" value="{{ selected_month }}"
-                       class="form-control form-control-custom">
+                       class="form-control form-control-custom" style="padding-left: 1rem;">
             </div>
             <div class="col-sm-4 col-lg-3">
-                <label class="form-label-custom">Type</label>
-                <select name="type" class="form-select form-select-custom">
+                <label class="form-label-custom">
+                    <i class="bi bi-filter me-1"></i>Type
+                </label>
+                <select name="type" class="form-select form-select-custom" style="padding-left: 1rem;">
                     <option value="">All Types</option>
                     <option value="Income"  {% if selected_type == 'Income' %}selected{% endif %}>Income</option>
                     <option value="Expense" {% if selected_type == 'Expense' %}selected{% endif %}>Expense</option>
                 </select>
             </div>
             <div class="col-sm-4 col-lg-3">
-                <label class="form-label-custom">Category</label>
-                <select name="category" class="form-select form-select-custom">
+                <label class="form-label-custom">
+                    <i class="bi bi-tag me-1"></i>Category
+                </label>
+                <select name="category" class="form-select form-select-custom" style="padding-left: 1rem;">
                     <option value="">All Categories</option>
                     {% for cat in categories %}
                     <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
@@ -44,7 +52,7 @@
                 <button type="submit" class="btn btn-primary-custom flex-grow-1">
                     <i class="bi bi-funnel me-1"></i>Filter
                 </button>
-                <a href="{{ url_for('transactions') }}" class="btn btn-outline-secondary">
+                <a href="{{ url_for('transactions') }}" class="btn btn-outline-secondary" style="border-radius: var(--radius-sm); border-color: var(--border); color: var(--text-2);">
                     <i class="bi bi-x-lg"></i>
                 </a>
             </div>
@@ -110,7 +118,8 @@
             {% else %}
             <div class="empty-state py-5">
                 <i class="bi bi-search fs-1 mb-3"></i>
-                <p class="mb-3">No transactions match your filters.</p>
+                <p class="mb-1 fw-500" style="color: var(--text-2);">No transactions found</p>
+                <p class="mb-3">Try adjusting your filters or add a new transaction.</p>
                 <a href="{{ url_for('transactions') }}" class="btn btn-primary-custom">
                     Clear Filters
                 </a>
